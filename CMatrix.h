@@ -123,7 +123,7 @@ public:
 
     double getDeterminant();
 
-    double getTranspose();
+    CMatrix getTranspose();
 
     double getInverse();
 };
