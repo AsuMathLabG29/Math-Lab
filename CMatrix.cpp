@@ -3,10 +3,9 @@
 //
 
 #include "CMatrix.h"
+#include "../../../../../usr/include/c++/7.2.0/cstdlib"
 #include <cstdarg>
 #include <cstring>
-#include <string>
-#include <cstdio>
 #include <algorithm>
 
 CMatrix::CMatrix() {
@@ -69,7 +68,7 @@ CMatrix::CMatrix(int nR, int nC, double first, ...) {
     va_end(va);
 }
 
-CMatrix::CMatrix(CMatrix &m) {
+CMatrix::CMatrix(const CMatrix &m) {
     nR = nC = 0;
     values = NULL;
     copy(m);
@@ -81,7 +80,7 @@ CMatrix::CMatrix(std::string s) {
     copy(s);
 }
 
-void CMatrix::copy(CMatrix &m) {
+void CMatrix::copy(const CMatrix &m) {
     reset();
     this->nR = m.nR;
     this->nC = m.nC;
@@ -126,8 +125,8 @@ void CMatrix::copy(std::string s) {
         char *separators = " []";
         char *token = strtok_r(line, separators, &context);
         while (token) {
-            CMatrix&& m = std::move(atof(token));
-            CMatrix item = m;
+//            CMatrix&& m = std::move(atof(token));
+            CMatrix item = atof(token);
             row.addColumn(item);
             token = strtok_r(NULL, separators, &context);
         }
@@ -161,7 +160,7 @@ std::string CMatrix::getString() {
     return s;
 }
 
-CMatrix CMatrix::operator=(CMatrix &m) {
+CMatrix CMatrix::operator=(const CMatrix &m) {
     copy(m);
     return *this;
 }
@@ -176,7 +175,7 @@ CMatrix CMatrix::operator=(std::string s) {
     return *this;
 }
 
-void CMatrix::add(CMatrix &m) {
+void CMatrix::add(const CMatrix &m) {
     if (nR != m.nR || nC != m.nC)
         throw ("Invalid matrix dimension");
     for (int iR = 0; iR < nR; iR++)
@@ -184,16 +183,16 @@ void CMatrix::add(CMatrix &m) {
             values[iR][iC] += m.values[iR][iC];
 }
 
-void CMatrix::operator+=(CMatrix &m) {
+void CMatrix::operator+=(const CMatrix &m) {
     add(m);
 }
 
 void CMatrix::operator+=(double d) {
-    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, d));
-    add(m);
+//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, d));
+    add(CMatrix(nR, nC, MI_VALUE, d));
 }
 
-CMatrix CMatrix::operator+(CMatrix &m) {
+CMatrix CMatrix::operator+(const CMatrix &m) {
     CMatrix r = *this;
     r += m;
     return r;
@@ -205,7 +204,7 @@ CMatrix CMatrix::operator+(double d) {
     return r;
 }
 
-void CMatrix::sub(CMatrix &m) {
+void CMatrix::sub(const CMatrix &m) {
     if (nR != m.nR || nC != m.nC)
         throw ("Invalid matrix dimension");
     for (int iR = 0; iR < nR; iR++)
@@ -213,16 +212,16 @@ void CMatrix::sub(CMatrix &m) {
             values[iR][iC] -= m.values[iR][iC];
 }
 
-void CMatrix::operator-=(CMatrix &m) {
+void CMatrix::operator-=(const CMatrix &m) {
     sub(m);
 }
 
 void CMatrix::operator-=(double d) {
-    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, d));
-    sub(m);
+//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, d));
+    sub(CMatrix(nR, nC, MI_VALUE, d));
 }
 
-CMatrix CMatrix::operator-(CMatrix &m) {
+CMatrix CMatrix::operator-(const CMatrix &m) {
     CMatrix r = *this;
     r -= m;
     return r;
@@ -234,7 +233,7 @@ CMatrix CMatrix::operator-(double d) {
     return r;
 }
 
-void CMatrix::mul(CMatrix &m) {
+void CMatrix::mul(const CMatrix &m) {
     if (nR != m.nR || nC != m.nC)
         throw ("Invalid matrix dimension");
     CMatrix r(nR, m.nC);
@@ -247,7 +246,7 @@ void CMatrix::mul(CMatrix &m) {
     copy(r);
 }
 
-void CMatrix::operator*=(CMatrix &m) {
+void CMatrix::operator*=(const CMatrix &m) {
     mul(m);
 }
 
@@ -257,7 +256,7 @@ void CMatrix::operator*=(double d) {
             values[iR][iC] *= d;
 }
 
-CMatrix CMatrix::operator*(CMatrix &m) {
+CMatrix CMatrix::operator*(const CMatrix &m) {
     CMatrix r = *this;
     r *= m;
     return r;
@@ -269,7 +268,7 @@ CMatrix CMatrix::operator*(double d) {
     return r;
 }
 
-void CMatrix::div(CMatrix &m) {
+void CMatrix::div(const CMatrix &m) {
     if (nR != m.nR || nC != m.nC)
         throw ("Invalid matrix dimension");
     CMatrix r(nR, m.nC);
@@ -282,7 +281,7 @@ void CMatrix::div(CMatrix &m) {
     copy(r);
 }
 
-void CMatrix::operator/=(CMatrix &m) {
+void CMatrix::operator/=(const CMatrix &m) {
     div(m);
 }
 
@@ -292,7 +291,7 @@ void CMatrix::operator/=(double d) {
             values[iR][iC] /= d;
 }
 
-CMatrix CMatrix::operator/(CMatrix &m) {
+CMatrix CMatrix::operator/(const CMatrix &m) {
     CMatrix r = *this;
     r /= m;
     return r;
@@ -305,28 +304,28 @@ CMatrix CMatrix::operator/(double d) {
 }
 
 CMatrix CMatrix::operator++() {
-    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
-    add(m);
+//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
+    add(CMatrix(nR, nC, MI_VALUE, 1.0));
     return *this;
 }
 
 CMatrix CMatrix::operator++(int) {
     CMatrix C = *this;
-    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
-    add(m);
+//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
+    add(CMatrix(nR, nC, MI_VALUE, 1.0));
     return C;
 }
 
 CMatrix CMatrix::operator--() {
-    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, -1.0));
-    add(m);
+//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, -1.0));
+    add(CMatrix(nR, nC, MI_VALUE, -1.0));
     return *this;
 }
 
 CMatrix CMatrix::operator--(int) {
     CMatrix r = *this;
-    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, -1.0));
-    add(m);
+//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, -1.0));
+    add(CMatrix(nR, nC, MI_VALUE, -1.0));
     return r;
 }
 
@@ -341,7 +340,7 @@ CMatrix CMatrix::operator+() {
     return *this;
 }
 
-void CMatrix::setSubMatrix(int r, int c, CMatrix &m) {
+void CMatrix::setSubMatrix(int r, int c, const CMatrix &m) {
     if ((r + m.nR) > nR || (c + m.nC) > nC)throw ("Invalid matrix dimension");
     for (int iR = 0; iR < m.nR; iR++)
         for (int iC = 0; iC < m.nC; iC++)
@@ -357,14 +356,14 @@ CMatrix CMatrix::getSubMatrix(int r, int c, int nr, int nc) {
     return m;
 }
 
-void CMatrix::addColumn(CMatrix &m) {
+void CMatrix::addColumn(const CMatrix &m) {
     CMatrix n(std::max(nR, m.nR), nC + m.nC);
     n.setSubMatrix(0, 0, *this);
     n.setSubMatrix(0, nC, m);
     *this = n;
 }
 
-void CMatrix::addRow(CMatrix &m) {
+void CMatrix::addRow(const CMatrix &m) {
     CMatrix n(nR + m.nR, std::max(nC, m.nC));
     n.setSubMatrix(0, 0, *this);
     n.setSubMatrix(nR, 0, m);
@@ -410,13 +409,12 @@ CMatrix CMatrix::getTranspose() {
 std::istream &operator>>(std::istream &is, CMatrix &m) {
     std::string s;
     getline(is, s, ']');
-    s += "]";
-    CMatrix&& m1 = std::move(CMatrix(s));
-    m = m1;
+    s+="]";
+    m = CMatrix(s);
     return is;
 }
 
-std::ostream &operator<<(std::ostream &os, CMatrix &m) {
+std::ostream&operator<<(std::ostream &os,CMatrix &m) {
     os << m.getString();
     return os;
 }

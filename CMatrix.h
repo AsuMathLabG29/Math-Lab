@@ -25,13 +25,13 @@ public:
 
     CMatrix(int nR, int nC, double first, ...);
 
-    CMatrix(CMatrix &m);
+    CMatrix(const CMatrix &m);
 
     CMatrix(double d);
 
     CMatrix(std::string s);
 
-    void copy(CMatrix &m);
+    void copy(const CMatrix &m);
 
     void copy(double d);
 
@@ -42,49 +42,49 @@ public:
 
     std::string getString();
 
-    CMatrix operator=(CMatrix &m);
+    CMatrix operator=(const CMatrix &m);
 
     CMatrix operator=(double d);
 
     CMatrix operator=(std::string s);
 
-    void add(CMatrix &m);
+    void add(const CMatrix &m);
 
-    void operator+=(CMatrix &m);
+    void operator+=(const CMatrix &m);
 
     void operator+=(double d);
 
-    CMatrix operator+(CMatrix &m);
+    CMatrix operator+(const CMatrix &m);
 
     CMatrix operator+(double d);
 
-    void sub(CMatrix &m);
+    void sub(const CMatrix &m);
 
-    void operator-=(CMatrix &m);
+    void operator-=(const CMatrix &m);
 
     void operator-=(double d);
 
-    CMatrix operator-(CMatrix &m);
+    CMatrix operator-(const CMatrix &m);
 
     CMatrix operator-(double d);
 
-    void mul(CMatrix &m);
+    void mul(const CMatrix &m);
 
-    void operator*=(CMatrix &m);
+    void operator*=(const CMatrix &m);
 
     void operator*=(double d);
 
-    CMatrix operator*(CMatrix &m);
+    CMatrix operator*(const CMatrix &m);
 
     CMatrix operator*(double d);
 
-    void div(CMatrix &m);
+    void div(const CMatrix &m);
 
-    void operator/=(CMatrix &m);
+    void operator/=(const CMatrix &m);
 
     void operator/=(double d);
 
-    CMatrix operator/(CMatrix &m);
+    CMatrix operator/(const CMatrix &m);
 
     CMatrix operator/(double d);
 
@@ -99,15 +99,15 @@ public:
 
     friend std::istream &operator>>(std::istream &is, CMatrix &C); //Stream
     friend std::ostream &operator<<(std::ostream &os, CMatrix &C); //Stream
-    void setSubMatrix(int iR, int iC, CMatrix &m);
+    void setSubMatrix(int iR, int iC, const CMatrix &m);
 
     CMatrix getSubMatrix(int r, int c, int nr, int nc);
 
     CMatrix getCofactor(int r, int c);
 
-    void addColumn(CMatrix &m);
+    void addColumn(const CMatrix &m);
 
-    void addRow(CMatrix &m);
+    void addRow(const CMatrix &m);
 
     double &operator[](int i) { return values[i / nC][i % nC]; }
 
