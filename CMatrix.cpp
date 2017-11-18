@@ -302,6 +302,7 @@ CMatrix CMatrix::operator/(double d) {
     return r;
 }
 
+
 CMatrix CMatrix::operator++() {
 //    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
     add(CMatrix(nR, nC, MI_VALUE, 1.0));
