@@ -116,12 +116,12 @@ void CMatrix::copy(std::string s) {
     char *buffer = new char[s.length() + 1];
     strcpy(buffer, s.c_str());
     char *lineContext;
-    char *lineSeparators = ";\r\n";
+    const char *lineSeparators = ";\r\n";
     char *line = strtok_r(buffer, lineSeparators, &lineContext);
     while (line) {
         CMatrix row;
         char *context;
-        char *separators = " []";
+        const char *separators = " []";
         char *token = strtok_r(line, separators, &context);
         while (token) {
 //            CMatrix&& m = std::move(atof(token));
