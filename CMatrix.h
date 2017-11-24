@@ -9,9 +9,9 @@
 #include <iostream>
 
 class CMatrix {
+public:
     int nR, nC;
     double **values;
-public:
     CMatrix();
 
     ~CMatrix();
@@ -127,5 +127,5 @@ public:
 
     double getInverse();
 };
-
+CMatrix operator/(double d, const CMatrix &m);
 #endif //MATH_LAB_CMATRIX_H

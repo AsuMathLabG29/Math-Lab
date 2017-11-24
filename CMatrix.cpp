@@ -124,7 +124,6 @@ void CMatrix::copy(std::string s) {
         const char *separators = " []";
         char *token = strtok_r(line, separators, &context);
         while (token) {
-//            CMatrix&& m = std::move(atof(token));
             CMatrix item = atof(token);
             row.addColumn(item);
             token = strtok_r(NULL, separators, &context);
@@ -187,7 +186,6 @@ void CMatrix::operator+=(const CMatrix &m) {
 }
 
 void CMatrix::operator+=(double d) {
-//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, d));
     add(CMatrix(nR, nC, MI_VALUE, d));
 }
 
@@ -216,7 +214,6 @@ void CMatrix::operator-=(const CMatrix &m) {
 }
 
 void CMatrix::operator-=(double d) {
-//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, d));
     sub(CMatrix(nR, nC, MI_VALUE, d));
 }
 
@@ -274,8 +271,10 @@ void CMatrix::div(const CMatrix &m) {
     for (int iR = 0; iR < r.nR; iR++)
         for (int iC = 0; iC < r.nC; iC++) {
             r.values[iR][iC] = 0;
-            for (int k = 0; k < m.nC; k++)
+            for (int k = 0; k < m.nC; k++) {
+                if (m.values[k][iC] == 0) throw ("Error: division by zero");
                 r.values[iR][iC] += values[iR][k] / m.values[k][iC];
+            }
         }
     copy(r);
 }
@@ -285,9 +284,19 @@ void CMatrix::operator/=(const CMatrix &m) {
 }
 
 void CMatrix::operator/=(double d) {
+    if (d == 0) throw ("Error: division by zero");
     for (int iR = 0; iR < nR; iR++)
         for (int iC = 0; iC < nC; iC++)
             values[iR][iC] /= d;
+}
+CMatrix operator/(double d ,const CMatrix &m) {
+    CMatrix r(m.nR,m.nC);
+    for (int iR = 0; iR < m.nR; iR++)
+        for (int iC = 0; iC < m.nC; iC++) {
+            if (m.values[iR][iC] == 0) throw ("Error: division by zero");
+            r.values[iR][iC] = d / m.values[iR][iC];
+        }
+    return r;
 }
 
 CMatrix CMatrix::operator/(const CMatrix &m) {
@@ -304,27 +313,23 @@ CMatrix CMatrix::operator/(double d) {
 
 
 CMatrix CMatrix::operator++() {
-//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
     add(CMatrix(nR, nC, MI_VALUE, 1.0));
     return *this;
 }
 
 CMatrix CMatrix::operator++(int) {
     CMatrix C = *this;
-//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, 1.0));
     add(CMatrix(nR, nC, MI_VALUE, 1.0));
     return C;
 }
 
 CMatrix CMatrix::operator--() {
-//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, -1.0));
     add(CMatrix(nR, nC, MI_VALUE, -1.0));
     return *this;
 }
 
 CMatrix CMatrix::operator--(int) {
     CMatrix r = *this;
-//    CMatrix&& m = std::move(CMatrix(nR, nC, MI_VALUE, -1.0));
     add(CMatrix(nR, nC, MI_VALUE, -1.0));
     return r;
 }
@@ -394,11 +399,9 @@ double CMatrix::getDeterminant() {
 }
 
 CMatrix CMatrix::getTranspose() {
-    CMatrix r(nC,nR);
-    for (int iR = 0; iR < r.nR; iR++)
-    {
-        for (int iC = 0; iC < r.nC; iC++)
-        {
+    CMatrix r(nC, nR);
+    for (int iR = 0; iR < r.nR; iR++) {
+        for (int iC = 0; iC < r.nC; iC++) {
             r.values[iR][iC] = values[iC][iR];
         }
     }
@@ -409,12 +412,12 @@ CMatrix CMatrix::getTranspose() {
 std::istream &operator>>(std::istream &is, CMatrix &m) {
     std::string s;
     getline(is, s, ']');
-    s+="]";
+    s += "]";
     m = CMatrix(s);
     return is;
 }
 
-std::ostream&operator<<(std::ostream &os,CMatrix &m) {
+std::ostream &operator<<(std::ostream &os, CMatrix &m) {
     os << m.getString();
     return os;
 }
