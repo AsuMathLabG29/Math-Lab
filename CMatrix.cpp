@@ -289,15 +289,6 @@ void CMatrix::operator/=(double d) {
         for (int iC = 0; iC < nC; iC++)
             values[iR][iC] /= d;
 }
-CMatrix operator/(double d ,const CMatrix &m) {
-    CMatrix r(m.nR,m.nC);
-    for (int iR = 0; iR < m.nR; iR++)
-        for (int iC = 0; iC < m.nC; iC++) {
-            if (m.values[iR][iC] == 0) throw ("Error: division by zero");
-            r.values[iR][iC] = d / m.values[iR][iC];
-        }
-    return r;
-}
 
 CMatrix CMatrix::operator/(const CMatrix &m) {
     CMatrix r = *this;
@@ -420,4 +411,41 @@ std::istream &operator>>(std::istream &is, CMatrix &m) {
 std::ostream &operator<<(std::ostream &os, CMatrix &m) {
     os << m.getString();
     return os;
+}
+
+CMatrix operator/(double d ,const CMatrix &m) {
+    CMatrix r(m.nR,m.nC);
+    for (int iR = 0; iR < m.nR; iR++)
+        for (int iC = 0; iC < m.nC; iC++) {
+            if (m.values[iR][iC] == 0) throw ("Error: division by zero");
+            r.values[iR][iC] = d / m.values[iR][iC];
+        }
+    return r;
+}
+
+CMatrix operator*(double d ,const CMatrix &m) {
+    CMatrix r(m.nR,m.nC);
+    for (int iR = 0; iR < m.nR; iR++)
+        for (int iC = 0; iC < m.nC; iC++) {
+            r.values[iR][iC] = d * m.values[iR][iC];
+        }
+    return r;
+}
+
+CMatrix operator+(double d ,const CMatrix &m) {
+    CMatrix r(m.nR,m.nC);
+    for (int iR = 0; iR < m.nR; iR++)
+        for (int iC = 0; iC < m.nC; iC++) {
+            r.values[iR][iC] = d + m.values[iR][iC];
+        }
+    return r;
+}
+
+CMatrix operator-(double d ,const CMatrix &m) {
+    CMatrix r(m.nR,m.nC);
+    for (int iR = 0; iR < m.nR; iR++)
+        for (int iC = 0; iC < m.nC; iC++) {
+            r.values[iR][iC] = d - m.values[iR][iC];
+        }
+    return r;
 }

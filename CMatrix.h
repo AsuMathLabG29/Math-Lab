@@ -128,4 +128,7 @@ public:
     double getInverse();
 };
 CMatrix operator/(double d, const CMatrix &m);
+CMatrix operator*(double d, const CMatrix &m);
+CMatrix operator+(double d, const CMatrix &m);
+CMatrix operator-(double d, const CMatrix &m);
 #endif //MATH_LAB_CMATRIX_H
