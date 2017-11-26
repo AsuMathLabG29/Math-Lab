@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
 
 //    C = A + B
 //    D = A - B
-    
+
+//    argv[1] = "/home/abyss/Workspace/CLionProjects/Math Lab/example.m";
     ifstream testFile(argv[1]);
 
     string str;
@@ -113,9 +114,10 @@ int main(int argc, char *argv[])
 
         if (op != 'o'){
 
-            CMatrix A = matrixVec[atoi(checkMatrix(matrixOp[1]).c_str())];
-            CMatrix B = matrixVec[atoi(checkMatrix(matrixOp[2]).c_str())];
+            CMatrix A = matrixVec[0];
+            CMatrix B = matrixVec[1];
             CMatrix C = CMatrix(matrixOp[0]);
+
             char name = 'a';
 
             switch (op){
