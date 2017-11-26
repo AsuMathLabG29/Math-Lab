@@ -9,6 +9,7 @@
 #include <iostream>
 
 class CMatrix {
+    char name;
 public:
     int nR, nC;
     double **values;
@@ -31,6 +32,8 @@ public:
 
     CMatrix(std::string s);
 
+    CMatrix(char name);
+
     void copy(const CMatrix &m);
 
     void copy(double d);
@@ -39,6 +42,9 @@ public:
 
     void reset();
 
+    void setName(char name);
+
+    char getName();
 
     std::string getString();
 

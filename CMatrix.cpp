@@ -10,8 +10,13 @@
 CMatrix::CMatrix() {
     nR = nC = 0;
     values = NULL;
+    name = 'a';
 }
-
+CMatrix::CMatrix(char name) {
+    this->name = name;
+    nR = nC = 0;
+    values = NULL;
+}
 CMatrix::~CMatrix() {
     reset();
 }
@@ -77,6 +82,14 @@ CMatrix::CMatrix(std::string s) {
     nR = nC = 0;
     values = NULL;
     copy(s);
+}
+
+void CMatrix::setName(char name) {
+    this->name = name;
+}
+
+char CMatrix::getName() {
+    return this->name;
 }
 
 void CMatrix::copy(const CMatrix &m) {
