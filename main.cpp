@@ -4,54 +4,10 @@
 #include "sstream"
 #include <fstream>
 #include <stdlib.h>
-#include "CVariable.h"
-#include "functions.h"
+#include <vector>
+#include "CMatrix.h"
 
 using namespace std;
-
-
-//The global database
-//CVarDB database;
-
-//int main(int argv, char* argc[])
-//{
-//    //Declare global database
-//    database = *new CVarDB();
-//
-//    //Get the input
-//    string Buffer;
-//    while (getline(cin, Buffer))
-//    {
-//        if (Buffer.compare("quit")==0) // if the input is 'quit'
-//        {
-//            cout<<"\nThank you. "; //quit the program
-//            break;
-//        }
-//        else if(Buffer.compare("who") == 0) //print the variables
-//        {
-//            cout << "Variables:";
-//            database.print();
-//        }
-//        else
-//        {
-//            // process the command line
-//            try {
-//                Interpreter(Buffer,database);
-//            } catch (exception& e){
-//                cout << e.what();
-//            }
-//
-//
-//        }
-//    }
-//
-//
-//
-//    cout<<"Now closing..."<<endl;
-//
-//
-//    return 0;
-//}
 
 
 vector<CMatrix> matrixVec;
@@ -82,8 +38,7 @@ int main(int argc, char *argv[])
 
 //    C = A + B
 //    D = A - B
-
-    argv[1] = "/home/abyss/Workspace/CLionProjects/Math Lab/bigexample.m";
+    
     ifstream testFile(argv[1]);
 
     string str;
