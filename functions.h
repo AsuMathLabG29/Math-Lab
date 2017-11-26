@@ -85,7 +85,7 @@ bool assign(const char* lhs, const char* rhs, CVarDB &database)
         {
             CVariable newvar = *new CVariable(lhs, *rhs); //Create a new variable with the name of LHS and the value of RHS
             std::cout << lhs << " =" << std::endl;
-            printMatrix(*newvar);
+            std::cout << *newvar << std::endl;;
             return database.add(newvar); //Add to the database
         }
         else
@@ -94,14 +94,14 @@ bool assign(const char* lhs, const char* rhs, CVarDB &database)
             {
                 CVariable newvar = *new CVariable(lhs, *new CMatrix(atof(rhs)));
                 std::cout << lhs << " =" << std::endl;
-                printMatrix(*newvar);
+                std::cout << *newvar << std::endl;;
                 return database.add(newvar); //Add to the database
             }
             else if (rhs[0] == '[') //If it's a matrix
             {
                 CVariable newvar = *new CVariable(lhs, *new CMatrix(rhs));
                 std::cout << lhs << " =" << std::endl;
-                printMatrix(*newvar); //Print the matrix
+                std::cout << *newvar << std::endl;; //Print the matrix
                 return database.add(newvar);
             }
             else //If it's not a variable, matrix, or number then the assignment fails
@@ -206,22 +206,22 @@ bool compound_op(char* operand_1, OP compound_op, char* operand_2, CVarDB &datab
         case ADD_EQ: //x += y
             **database.search(operand_1) = curr_value + ass_value;
             std::cout << operand_1 << " =" << std::endl;
-            printMatrix(**database.search(operand_1));
+            std::cout << **database.search(operand_1) << std::endl;;
             return true;
         case MIN_EQ: //x -= y
             **database.search(operand_1) = curr_value - ass_value;
             std::cout << operand_1 << " =" << std::endl;
-            printMatrix(**database.search(operand_1));
+            std::cout << **database.search(operand_1) << std::endl;;
             return true;;
         case MUL_EQ: //x *= y
             **database.search(operand_1) = curr_value * ass_value;
             std::cout << operand_1 << " =" << std::endl;
-            printMatrix(**database.search(operand_1));
+            std::cout << **database.search(operand_1) << std::endl;;
             return true;
         case DIV_EQ: //x /= y
             **database.search(operand_1) = curr_value / ass_value;
             std::cout << operand_1 << " =" << std::endl;
-            printMatrix(**database.search(operand_1));
+            std::cout << **database.search(operand_1) << std::endl;;
             return true;
         default: //Not a unary operator
             std::cout << "UNRECOGNIZED OPERATOR" ;
@@ -316,14 +316,14 @@ bool binary_assign(const char* assign_var, const char* left, OP op, const char* 
         CVariable temp = *new CVariable(assign_var, assign_val);
         database.add(temp);
         std::cout << assign_var << " =" << std::endl;
-        printMatrix(*temp);
+        std::cout << *temp << std::endl;;
         return true;
     }
     else //Otherwise create assign_var with the calculated value and add it to the database
     {
         **database.search(assign_var) = assign_val;
         std::cout << assign_var << " =" << std::endl;
-        printMatrix(assign_val);
+        std::cout << assign_val << std::endl;;
         return true;
     }
 

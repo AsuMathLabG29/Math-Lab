@@ -103,8 +103,8 @@ public:
 
     CMatrix getSubMatrix(int r, int c, int nr, int nc);
 
-    CMatrix getCofactor(int r, int c);
-
+    CMatrix getCofactorMatrix(int r, int c);
+    double getCofactor(int r, int c);
     void addColumn(const CMatrix &m);
 
     void addRow(const CMatrix &m);
@@ -127,8 +127,10 @@ public:
 
     double getInverse();
 };
+double getDeterminant(CMatrix &m, int n);
 CMatrix operator/(double d, const CMatrix &m);
 CMatrix operator*(double d, const CMatrix &m);
 CMatrix operator+(double d, const CMatrix &m);
 CMatrix operator-(double d, const CMatrix &m);
+void printMatrix(CMatrix &m);
 #endif //MATH_LAB_CMATRIX_H

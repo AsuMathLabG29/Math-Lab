@@ -366,7 +366,7 @@ void CMatrix::addRow(const CMatrix &m) {
     *this = n;
 }
 
-CMatrix CMatrix::getCofactor(int r, int c) {
+CMatrix CMatrix::getCofactorMatrix(int r, int c) {
     if (nR <= 1 && nC <= 1)throw ("Invalid matrix dimension");
     CMatrix m(nR - 1, nC - 1);
     for (int iR = 0; iR < m.nR; iR++)
@@ -378,12 +378,16 @@ CMatrix CMatrix::getCofactor(int r, int c) {
     return m;
 }
 
+double CMatrix::getCofactor(int r, int c){
+    return values[r][c];
+}
+
 double CMatrix::getDeterminant() {
     if (nR != nC)throw ("Invalid matrix dimension");
     if (nR == 1 && nC == 1)return values[0][0];
     double value = 0, m = 1;
     for (int iR = 0; iR < nR; iR++) {
-        value += m * values[0][iR] * getCofactor(0, iR).getDeterminant();
+        value += m * values[0][iR] * getCofactorMatrix(0, iR).getDeterminant();
         m *= -1;
     }
     return value;
