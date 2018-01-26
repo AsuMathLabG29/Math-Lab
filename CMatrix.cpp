@@ -12,11 +12,13 @@ CMatrix::CMatrix() {
     values = NULL;
     name = 'a';
 }
+
 CMatrix::CMatrix(char name) {
     this->name = name;
     nR = nC = 0;
     values = NULL;
 }
+
 CMatrix::~CMatrix() {
     reset();
 }
@@ -379,7 +381,7 @@ void CMatrix::addRow(const CMatrix &m) {
     *this = n;
 }
 
-CMatrix CMatrix::getCofactorMatrix(int r, int c) {
+CMatrix & CMatrix::getCofactorMatrix(int r, int c){
     if (nR <= 1 && nC <= 1)throw ("Invalid matrix dimension");
     CMatrix m(nR - 1, nC - 1);
     for (int iR = 0; iR < m.nR; iR++)
@@ -391,19 +393,8 @@ CMatrix CMatrix::getCofactorMatrix(int r, int c) {
     return m;
 }
 
-double CMatrix::getCofactor(int r, int c){
+double CMatrix::getCofactor(int r, int c) {
     return values[r][c];
-}
-
-double CMatrix::getDeterminant() {
-    if (nR != nC)throw ("Invalid matrix dimension");
-    if (nR == 1 && nC == 1)return values[0][0];
-    double value = 0, m = 1;
-    for (int iR = 0; iR < nR; iR++) {
-        value += m * values[0][iR] * getCofactorMatrix(0, iR).getDeterminant();
-        m *= -1;
-    }
-    return value;
 }
 
 CMatrix CMatrix::getTranspose() {
@@ -430,39 +421,50 @@ std::ostream &operator<<(std::ostream &os, CMatrix &m) {
     return os;
 }
 
-CMatrix operator/(double d ,const CMatrix &m) {
-    CMatrix r(m.nR,m.nC);
-    for (int iR = 0; iR < m.nR; iR++)
-        for (int iC = 0; iC < m.nC; iC++) {
-            if (m.values[iR][iC] == 0) throw ("Error: division by zero");
-            r.values[iR][iC] = d / m.values[iR][iC];
+double det(CMatrix &m) {
+    if (m.getnR() != m.getnC())throw ("Invalid matrix dimension");
+    if (m.getnR() == 1 && m.getnC() == 1)return m(0,0);
+    double value = 0, n = 1;
+    for (int iR = 0; iR < m.getnR(); iR++) {
+        value += n * m(0,iR) * det(m.getCofactorMatrix(0, iR));
+        n *= -1;
+    }
+    return value;
+}
+
+CMatrix operator/(double d,CMatrix &m) {
+    CMatrix r(m.getnR(), m.getnC());
+    for (int iR = 0; iR < m.getnR(); iR++)
+        for (int iC = 0; iC < m.getnC(); iC++) {
+            if (m(iR,iC) == 0) throw ("Error: division by zero");
+            r(iR,iC) = d / m(iR,iC);
         }
     return r;
 }
 
-CMatrix operator*(double d ,const CMatrix &m) {
-    CMatrix r(m.nR,m.nC);
-    for (int iR = 0; iR < m.nR; iR++)
-        for (int iC = 0; iC < m.nC; iC++) {
-            r.values[iR][iC] = d * m.values[iR][iC];
+CMatrix operator*(double d, CMatrix &m) {
+    CMatrix r(m.getnR(), m.getnC());
+    for (int iR = 0; iR < m.getnR(); iR++)
+        for (int iC = 0; iC < m.getnC(); iC++) {
+            r(iR,iC) = d * m(iR,iC);
         }
     return r;
 }
 
-CMatrix operator+(double d ,const CMatrix &m) {
-    CMatrix r(m.nR,m.nC);
-    for (int iR = 0; iR < m.nR; iR++)
-        for (int iC = 0; iC < m.nC; iC++) {
-            r.values[iR][iC] = d + m.values[iR][iC];
+CMatrix operator+(double d, CMatrix &m) {
+    CMatrix r(m.getnR(), m.getnC());
+    for (int iR = 0; iR < m.getnR(); iR++)
+        for (int iC = 0; iC < m.getnC(); iC++) {
+            r(iR,iC) = d + m(iR,iC);
         }
     return r;
 }
 
-CMatrix operator-(double d ,const CMatrix &m) {
-    CMatrix r(m.nR,m.nC);
-    for (int iR = 0; iR < m.nR; iR++)
-        for (int iC = 0; iC < m.nC; iC++) {
-            r.values[iR][iC] = d - m.values[iR][iC];
+CMatrix operator-(double d, CMatrix &m) {
+    CMatrix r(m.getnR(), m.getnC());
+    for (int iR = 0; iR < m.getnR(); iR++)
+        for (int iC = 0; iC < m.getnC(); iC++) {
+            r(iR,iC) = d - m(iR,iC);
         }
     return r;
 }

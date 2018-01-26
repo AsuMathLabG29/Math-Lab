@@ -5,14 +5,15 @@
 #ifndef MATH_LAB_CMATRIX_H
 #define MATH_LAB_CMATRIX_H
 
-#include <string.h>
+#include <cstring>
 #include <iostream>
+#include <cmath>
 
 class CMatrix {
     char name;
-public:
     int nR, nC;
     double **values;
+public:
     CMatrix();
 
     ~CMatrix();
@@ -109,8 +110,10 @@ public:
 
     CMatrix getSubMatrix(int r, int c, int nr, int nc);
 
-    CMatrix getCofactorMatrix(int r, int c);
+    CMatrix & getCofactorMatrix(int r, int c);
+
     double getCofactor(int r, int c);
+
     void addColumn(const CMatrix &m);
 
     void addRow(const CMatrix &m);
@@ -127,16 +130,19 @@ public:
 
     int getnC() { return nC; };
 
-    double getDeterminant();
-
     CMatrix getTranspose();
 
     double getInverse();
 };
-double getDeterminant(CMatrix &m, int n);
-CMatrix operator/(double d, const CMatrix &m);
-CMatrix operator*(double d, const CMatrix &m);
-CMatrix operator+(double d, const CMatrix &m);
-CMatrix operator-(double d, const CMatrix &m);
-void printMatrix(CMatrix &m);
+
+CMatrix operator/(double d, CMatrix &m);
+
+CMatrix operator*(double d, CMatrix &m);
+
+CMatrix operator+(double d, CMatrix &m);
+
+CMatrix operator-(double d, CMatrix &m);
+
+double det(CMatrix &m);
+
 #endif //MATH_LAB_CMATRIX_H
