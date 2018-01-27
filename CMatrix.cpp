@@ -4,8 +4,11 @@
 
 #include "CMatrix.h"
 #include <cstdarg>
-#include <cstring>
 #include <algorithm>
+#include "sstream"
+#include "iomanip"
+
+#define EPS 1e-10
 
 CMatrix::CMatrix() {
     nR = nC = 0;
@@ -161,16 +164,19 @@ void CMatrix::reset() {
 }
 
 std::string CMatrix::getString() {
-    std::string s;
+    std::ostringstream os;
+    os.precision(5);
+    os << std::fixed;
     for (int iR = 0; iR < nR; iR++) {
+        os << "\t\t";
         for (int iC = 0; iC < nC; iC++) {
-            char buffer[50];
-            snprintf(buffer, 50, "%g\t", values[iR][iC]);
-            s += buffer;
+            int pos = os.tellp();
+            if (values[iR][iC] < 0) { os.seekp(pos - 1); }
+            os << values[iR][iC] << "    ";
         }
-        s += "\n";
+        os << std::endl;
     }
-    return s;
+    return os.str();
 }
 
 CMatrix CMatrix::operator=(const CMatrix &m) {
@@ -381,7 +387,7 @@ void CMatrix::addRow(const CMatrix &m) {
     *this = n;
 }
 
-CMatrix & CMatrix::getCofactorMatrix(int r, int c){
+const CMatrix CMatrix::getCofactorMatrix(int r, int c) const {
     if (nR <= 1 && nC <= 1)throw ("Invalid matrix dimension");
     CMatrix m(nR - 1, nC - 1);
     for (int iR = 0; iR < m.nR; iR++)
@@ -422,22 +428,165 @@ std::ostream &operator<<(std::ostream &os, CMatrix &m) {
 }
 
 double det(CMatrix &m) {
-    if (m.getnR() != m.getnC())throw ("Invalid matrix dimension");
-    if (m.getnR() == 1 && m.getnC() == 1)return m(0,0);
-    double value = 0, n = 1;
-    for (int iR = 0; iR < m.getnR(); iR++) {
-        value += n * m(0,iR) * det(m.getCofactorMatrix(0, iR));
-        n *= -1;
+    if (m.nR != m.nC)throw ("Invalid matrix dimension");
+    if (m.nR == 1 && m.nC == 1)return m.values[0][0];
+    double det = 1;
+    CMatrix c = m.gaussianEliminate();
+//    double value = 0, n = 1;
+//    for (int iR = 0; iR < m.nR; iR++) {
+//        value += n * m.values[0][iR] * det(m.getCofactorMatrix(0, iR));
+//        n *= -1;
+//    }
+    for (int i = 0; i < m.nR; ++i) {
+
+        det *= c.values[i][i];
+
     }
-    return value;
+    return det;
 }
 
-CMatrix operator/(double d,CMatrix &m) {
+CMatrix CMatrix::getInverse() {
+    if (det(*this) == 0) throw("Determinant equal 0, the matrix is not invertible");
+    CMatrix I(nC, nR, MI_EYE);
+    CMatrix AI = CMatrix::augment(*this, I);
+    CMatrix U = AI.gaussianEliminate();
+    CMatrix IAInverse = U.rowReduceFromGaussian();
+    CMatrix AInverse(nC, nR);
+    for (int i = 0; i < AInverse.nR; ++i) {
+        for (int j = 0; j < AInverse.nC; ++j) {
+            AInverse(i, j) = IAInverse(i, j + nC);
+        }
+    }
+    return AInverse;
+}
+
+CMatrix CMatrix::augment(CMatrix &A, CMatrix &B) {
+    CMatrix AB(A.nR, A.nC + B.nC);
+    for (int i = 0; i < AB.nR; ++i) {
+        for (int j = 0; j < AB.nC; ++j) {
+            if (j < A.nC)
+                AB(i, j) = A(i, j);
+            else
+                AB(i, j) = B(i, j - B.nC);
+        }
+    }
+    return AB;
+}
+
+CMatrix CMatrix::gaussianEliminate() {
+    CMatrix Ab(*this);
+    int rows = Ab.nR;
+    int cols = Ab.nC;
+    int aCols = cols - 1;
+
+    int i = 0;
+    int j = 0;
+
+    while (i < rows) {
+        // find a pivot for the row
+        bool pivot_found = false;
+        while (j < aCols && !pivot_found) {
+            if (Ab(i, j) != 0) { // pivot not equal to 0
+                pivot_found = true;
+            } else { // check for a possible swap
+                int max_row = i;
+                double max_val = 0;
+                for (int k = i + 1; k < rows; ++k) {
+                    double cur_abs = Ab(k, j) >= 0 ? Ab(k, j) : -1 * Ab(k, j);
+                    if (cur_abs > max_val) {
+                        max_row = k;
+                        max_val = cur_abs;
+                    }
+                }
+                if (max_row != i) {
+                    Ab.swapRows(max_row, i);
+                    pivot_found = true;
+                } else {
+                    j++;
+                }
+            }
+        }
+
+        // perform elimination as normal if pivot was found
+        if (pivot_found) {
+            for (int t = i + 1; t < rows; ++t) {
+                for (int s = j + 1; s < cols; ++s) {
+                    Ab(t, s) = Ab(t, s) - Ab(i, s) * (Ab(t, j) / Ab(i, j));
+                    if (Ab(t, s) < EPS && Ab(t, s) > -1 * EPS)
+                        Ab(t, s) = 0;
+                }
+                Ab(t, j) = 0;
+            }
+        }
+
+        i++;
+        j++;
+    }
+
+    return Ab;
+}
+
+void CMatrix::swapRows(int r1, int r2) {
+    double *temp = values[r1];
+    values[r1] = values[r2];
+    values[r2] = temp;
+}
+
+CMatrix CMatrix::rowReduceFromGaussian() {
+    CMatrix R(*this);
+    int rows = R.nR;
+    int cols = R.nC;
+
+    int i = rows - 1; // row tracker
+    int j = cols - 2; // column tracker
+
+    // iterate through every row
+    while (i >= 0) {
+        // find the pivot column
+        int k = j - 1;
+        while (k >= 0) {
+            if (R(i, k) != 0)
+                j = k;
+            k--;
+        }
+
+        // zero out elements above pivots if pivot not 0
+        if (R(i, j) != 0) {
+
+            for (int t = i - 1; t >= 0; --t) {
+                for (int s = 0; s < cols; ++s) {
+                    if (s != j) {
+                        R(t, s) = R(t, s) - R(i, s) * (R(t, j) / R(i, j));
+                        if (R(t, s) < EPS && R(t, s) > -1 * EPS)
+                            R(t, s) = 0;
+                    }
+                }
+                R(t, j) = 0;
+            }
+
+            // divide row by pivot
+            for (int k = j + 1; k < cols; ++k) {
+                R(i, k) = R(i, k) / R(i, j);
+                if (R(i, k) < EPS && R(i, k) > -1 * EPS)
+                    R(i, k) = 0;
+            }
+            R(i, j) = 1;
+
+        }
+
+        i--;
+        j--;
+    }
+
+    return R;
+}
+
+CMatrix operator/(double d, CMatrix &m) {
     CMatrix r(m.getnR(), m.getnC());
     for (int iR = 0; iR < m.getnR(); iR++)
         for (int iC = 0; iC < m.getnC(); iC++) {
-            if (m(iR,iC) == 0) throw ("Error: division by zero");
-            r(iR,iC) = d / m(iR,iC);
+            if (m(iR, iC) == 0) throw ("Error: division by zero");
+            r(iR, iC) = d / m(iR, iC);
         }
     return r;
 }
@@ -446,7 +595,7 @@ CMatrix operator*(double d, CMatrix &m) {
     CMatrix r(m.getnR(), m.getnC());
     for (int iR = 0; iR < m.getnR(); iR++)
         for (int iC = 0; iC < m.getnC(); iC++) {
-            r(iR,iC) = d * m(iR,iC);
+            r(iR, iC) = d * m(iR, iC);
         }
     return r;
 }
@@ -455,7 +604,7 @@ CMatrix operator+(double d, CMatrix &m) {
     CMatrix r(m.getnR(), m.getnC());
     for (int iR = 0; iR < m.getnR(); iR++)
         for (int iC = 0; iC < m.getnC(); iC++) {
-            r(iR,iC) = d + m(iR,iC);
+            r(iR, iC) = d + m(iR, iC);
         }
     return r;
 }
@@ -464,7 +613,7 @@ CMatrix operator-(double d, CMatrix &m) {
     CMatrix r(m.getnR(), m.getnC());
     for (int iR = 0; iR < m.getnR(); iR++)
         for (int iC = 0; iC < m.getnC(); iC++) {
-            r(iR,iC) = d - m(iR,iC);
+            r(iR, iC) = d - m(iR, iC);
         }
     return r;
 }

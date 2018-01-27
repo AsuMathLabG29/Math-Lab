@@ -110,7 +110,7 @@ public:
 
     CMatrix getSubMatrix(int r, int c, int nr, int nc);
 
-    CMatrix & getCofactorMatrix(int r, int c);
+    const CMatrix getCofactorMatrix(int r, int c) const;
 
     double getCofactor(int r, int c);
 
@@ -130,9 +130,17 @@ public:
 
     int getnC() { return nC; };
 
+    void swapRows(int, int);
+
+    static CMatrix augment(CMatrix&,CMatrix&);
+    CMatrix gaussianEliminate();
+    CMatrix rowReduceFromGaussian();
+
     CMatrix getTranspose();
 
-    double getInverse();
+    CMatrix getInverse();
+
+    friend double det(CMatrix &m);
 };
 
 CMatrix operator/(double d, CMatrix &m);
@@ -142,7 +150,5 @@ CMatrix operator*(double d, CMatrix &m);
 CMatrix operator+(double d, CMatrix &m);
 
 CMatrix operator-(double d, CMatrix &m);
-
-double det(CMatrix &m);
 
 #endif //MATH_LAB_CMATRIX_H
