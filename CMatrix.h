@@ -22,8 +22,7 @@ public:
         MI_ZEROS, MI_ONES, MI_EYE, MI_RAND, MI_VALUE
     };
 
-    CMatrix(int nR, int nC, int initialization = MI_ZEROS, double
-    initializationValue = 0.0);
+    CMatrix(int nR, int nC, int initialization = MI_ZEROS, double initializationValue = 0.0);
 
     CMatrix(int nR, int nC, double first, ...);
 
@@ -35,27 +34,15 @@ public:
 
     CMatrix(char name);
 
-    void copy(const CMatrix &m);
-
-    void copy(double d);
-
-    void copy(std::string s);
-
-    void reset();
-
     void setName(char name);
 
     char getName();
 
-    std::string getString();
+    CMatrix &operator=(const CMatrix &m);
 
-    CMatrix operator=(const CMatrix &m);
+    CMatrix &operator=(double &d);
 
-    CMatrix operator=(double d);
-
-    CMatrix operator=(std::string s);
-
-    void add(const CMatrix &m);
+    CMatrix &operator=(const char*);
 
     void operator+=(const CMatrix &m);
 
@@ -65,8 +52,6 @@ public:
 
     CMatrix operator+(double d);
 
-    void sub(const CMatrix &m);
-
     void operator-=(const CMatrix &m);
 
     void operator-=(double d);
@@ -75,17 +60,13 @@ public:
 
     CMatrix operator-(double d);
 
-    void mul(const CMatrix &m);
-
     void operator*=(const CMatrix &m);
 
     void operator*=(double d);
 
     CMatrix operator*(const CMatrix &m);
 
-    CMatrix operator*(double d);
-
-    void div(const CMatrix &m);
+    CMatrix operator*(double &d);
 
     void operator/=(const CMatrix &m);
 
@@ -95,9 +76,9 @@ public:
 
     CMatrix operator/(double d);
 
-    CMatrix operator++(); //Pre Increment
+    CMatrix &operator++(); //Pre Increment
     CMatrix operator++(int); //Post Increment, int is not used
-    CMatrix operator--(); //Pre Increment
+    CMatrix &operator--(); //Pre Increment
     CMatrix operator--(int); //Post Increment, int is not used
 
     CMatrix operator-();
@@ -111,8 +92,6 @@ public:
     CMatrix getSubMatrix(int r, int c, int nr, int nc);
 
     const CMatrix getCofactorMatrix(int r, int c) const;
-
-    double getCofactor(int r, int c);
 
     void addColumn(const CMatrix &m);
 
@@ -130,10 +109,10 @@ public:
 
     int getnC() { return nC; };
 
-    void swapRows(int, int);
+    static CMatrix augment(CMatrix &, CMatrix &);
 
-    static CMatrix augment(CMatrix&,CMatrix&);
     CMatrix gaussianEliminate();
+
     CMatrix rowReduceFromGaussian();
 
     CMatrix getTranspose();
@@ -141,6 +120,27 @@ public:
     CMatrix getInverse();
 
     friend double det(CMatrix &m);
+
+private:
+    void copy(const CMatrix &m);
+
+    void copy(double &d);
+
+    void copy(std::string &s);
+
+    void reset();
+
+    std::string getString();
+
+    void sub(const CMatrix &m);
+
+    void mul(const CMatrix &m);
+
+    void add(const CMatrix &m);
+
+    void div(const CMatrix &m);
+
+    void swapRows(int, int);
 };
 
 CMatrix operator/(double d, CMatrix &m);

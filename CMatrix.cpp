@@ -120,7 +120,7 @@ CMatrix::CMatrix(double d) {
     copy(d);
 }
 
-void CMatrix::copy(double d) {
+void CMatrix::copy(double &d) {
     reset();
     this->nR = 1;
     this->nC = 1;
@@ -129,7 +129,7 @@ void CMatrix::copy(double d) {
     values[0][0] = d;
 }
 
-void CMatrix::copy(std::string s) {
+void CMatrix::copy(std::string &s) {
     reset();
     char *buffer = new char[s.length() + 1];
     strcpy(buffer, s.c_str());
@@ -168,7 +168,7 @@ std::string CMatrix::getString() {
     os.precision(5);
     os << std::fixed;
     for (int iR = 0; iR < nR; iR++) {
-        os << "\t\t";
+        os << "    ";
         for (int iC = 0; iC < nC; iC++) {
             int pos = os.tellp();
             if (values[iR][iC] < 0) { os.seekp(pos - 1); }
@@ -179,18 +179,19 @@ std::string CMatrix::getString() {
     return os.str();
 }
 
-CMatrix CMatrix::operator=(const CMatrix &m) {
+CMatrix &CMatrix::operator=(const CMatrix &m) {
     copy(m);
     return *this;
 }
 
-CMatrix CMatrix::operator=(double d) {
+CMatrix &CMatrix::operator=(double &d) {
     copy(d);
     return *this;
 }
 
-CMatrix CMatrix::operator=(std::string s) {
-    copy(s);
+CMatrix &CMatrix::operator=(const char *s) {
+    std::string c(s);
+    copy(c);
     return *this;
 }
 
@@ -279,7 +280,7 @@ CMatrix CMatrix::operator*(const CMatrix &m) {
     return r;
 }
 
-CMatrix CMatrix::operator*(double d) {
+CMatrix CMatrix::operator*(double &d) {
     CMatrix r = *this;
     r *= d;
     return r;
@@ -288,15 +289,19 @@ CMatrix CMatrix::operator*(double d) {
 void CMatrix::div(const CMatrix &m) {
     if (nR != m.nR || nC != m.nC)
         throw ("Invalid matrix dimension");
-    CMatrix r(nR, m.nC);
-    for (int iR = 0; iR < r.nR; iR++)
-        for (int iC = 0; iC < r.nC; iC++) {
-            r.values[iR][iC] = 0;
-            for (int k = 0; k < m.nC; k++) {
-                if (m.values[k][iC] == 0) throw ("Error: division by zero");
-                r.values[iR][iC] += values[iR][k] / m.values[k][iC];
-            }
+    CMatrix r(nR, nC);
+    CMatrix a = m;
+    try {
+        r = *this * a.getInverse();
+    } catch (const char *msg) {
+        try {
+            a = *this;
+            r = a.getInverse() * m;
+        } catch (const char *msg) {
+            throw("No unique solution");
         }
+
+    }
     copy(r);
 }
 
@@ -324,7 +329,7 @@ CMatrix CMatrix::operator/(double d) {
 }
 
 
-CMatrix CMatrix::operator++() {
+CMatrix &CMatrix::operator++() {
     add(CMatrix(nR, nC, MI_VALUE, 1.0));
     return *this;
 }
@@ -335,7 +340,7 @@ CMatrix CMatrix::operator++(int) {
     return C;
 }
 
-CMatrix CMatrix::operator--() {
+CMatrix &CMatrix::operator--() {
     add(CMatrix(nR, nC, MI_VALUE, -1.0));
     return *this;
 }
@@ -399,10 +404,6 @@ const CMatrix CMatrix::getCofactorMatrix(int r, int c) const {
     return m;
 }
 
-double CMatrix::getCofactor(int r, int c) {
-    return values[r][c];
-}
-
 CMatrix CMatrix::getTranspose() {
     CMatrix r(nC, nR);
     for (int iR = 0; iR < r.nR; iR++) {
@@ -432,11 +433,6 @@ double det(CMatrix &m) {
     if (m.nR == 1 && m.nC == 1)return m.values[0][0];
     double det = 1;
     CMatrix c = m.gaussianEliminate();
-//    double value = 0, n = 1;
-//    for (int iR = 0; iR < m.nR; iR++) {
-//        value += n * m.values[0][iR] * det(m.getCofactorMatrix(0, iR));
-//        n *= -1;
-//    }
     for (int i = 0; i < m.nR; ++i) {
 
         det *= c.values[i][i];
@@ -446,7 +442,7 @@ double det(CMatrix &m) {
 }
 
 CMatrix CMatrix::getInverse() {
-    if (det(*this) == 0) throw("Determinant equal 0, the matrix is not invertible");
+    if (det(*this) == 0) throw ("Determinant equal 0, the matrix is not invertible");
     CMatrix I(nC, nR, MI_EYE);
     CMatrix AI = CMatrix::augment(*this, I);
     CMatrix U = AI.gaussianEliminate();
@@ -565,10 +561,10 @@ CMatrix CMatrix::rowReduceFromGaussian() {
             }
 
             // divide row by pivot
-            for (int k = j + 1; k < cols; ++k) {
-                R(i, k) = R(i, k) / R(i, j);
-                if (R(i, k) < EPS && R(i, k) > -1 * EPS)
-                    R(i, k) = 0;
+            for (int l = j + 1; l < cols; ++l) {
+                R(i, l) = R(i, l) / R(i, j);
+                if (R(i, l) < EPS && R(i, l) > -1 * EPS)
+                    R(i, l) = 0;
             }
             R(i, j) = 1;
 
